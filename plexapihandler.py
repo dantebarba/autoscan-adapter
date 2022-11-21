@@ -1,6 +1,8 @@
+import os
 from plexapi.server import PlexServer
 from plexapi.library import ShowSection, MovieSection
 from plexapi.video import Movie, Episode
+
 
 class PlexApiHandler(object):
 
@@ -17,9 +19,14 @@ class PlexApiHandler(object):
                 result_set.extend(self.process_movies(section, directories))
             if isinstance(section, ShowSection):
                 result_set.extend(self.process_shows(section, directories))
-        
+
         return result_set
-        
+
+    @staticmethod
+    def file_path(full_path):
+        head, tail = os.path.split(full_path)
+        return head
+
     def process_shows(self, section: ShowSection, directories):
         library = section.all()
         result_set = []
@@ -36,7 +43,7 @@ class PlexApiHandler(object):
         result_set = []
         for element in library:
             for part in element.iterParts():
-                if part.file in directories:
+                if PlexApiHandler.file_path(part.file) in directories:
                     result_set.append(element)
         return result_set
 
@@ -46,4 +53,3 @@ class PlexApiHandler(object):
             element.refresh()
             files_refreshed.append(element.title)
         return files_refreshed
-        
