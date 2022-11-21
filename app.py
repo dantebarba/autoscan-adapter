@@ -10,8 +10,7 @@ plex_api = PlexApiHandler(os.getenv("PLEX_URL"), os.getenv("PLEX_TOKEN"))
 def ping():
     return "Ping successfull"
 
-
-@app.route("/triggers/manual", methods=["POST"])
+@app.route("/triggers/manual", methods=["POST", "GET", "HEAD"])
 def manual_trigger():
     directories = request.args.getlist('dir')
     if directories:
