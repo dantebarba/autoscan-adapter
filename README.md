@@ -1,6 +1,6 @@
 # Autoscan Plex Adapter
 
-This app creates a bridge between [cloudb0x/autoscan](https://github.com/Cloudbox/autoscan) with Plex to enable metadata refresh. Works by mimicking an autoscan server. When the adapter receives the directories it connects to the plex instance and iterates all movies and episodes looking for a directory match. If a match is found the directory is added to the processing list and the metadata element gets refreshed in Plex.
+This app creates a bridge between [cloudb0x/autoscan](https://github.com/Cloudbox/autoscan) and Plex to enable metadata refresh. Works by mimicking an autoscan server. When the adapter receives the directories it connects to the plex instance and iterates all movies and episodes looking for a directory match. If a match is found the directory is added to the processing list and the metadata element gets refreshed in Plex.
 
 **Disclaimer:** This app is WIP and has no authentication. Use it at your own risk.
 
