@@ -13,16 +13,12 @@ def ping():
 
 @app.route("/triggers/manual", methods=["POST", "GET", "HEAD"])
 def manual_trigger():
-    directories = request.args.getlist('dir')
-    current_app.logger.warning(
-        "Starting directory scan of: {}".format(directories))
-    if directories:
-        metadata_files = plex_api.find_metadata_from_dirs(
-            directories=directories)
+    directory = request.args.get("dir")
+    current_app.logger.warning("Starting directory scan of: {}".format(directory))
+
+    if directory:
+        metadata_files = plex_api.find_metadata_from_dirs(directory=directory)
         files_refreshed = plex_api.refresh_metadata(metadata_files)
-        return jsonify(
-            metadata_entries=files_refreshed
-        )
-    return jsonify(
-        metadata_files=[]
-    )
+        return jsonify(metadata_entries=files_refreshed)
+
+    return jsonify(metadata_files=[])
