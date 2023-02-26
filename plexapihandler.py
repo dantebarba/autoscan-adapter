@@ -38,17 +38,9 @@ class PlexApiHandler(object):
                 return self.process_shows(section, directory, media_name)
 
     def process_shows(self, section: ShowSection, directory, show_name):
-        library = section.searchShows(title=show_name)
-
-        # fall back to using the show name without date
-        if not library:
-            show_name_without_date = name_without_date(show_name)
-            if show_name_without_date:
-                library = section.searchShows(title=show_name_without_date)
-
-        # fall back to searching the entire library (slowest)
-        if not library:
-            library = section.all()
+        show_name_without_date = name_without_date(show_name)
+        show_titles = "{},{}".format(show_name, show_name_without_date)
+        library = section.searchShows(title=show_titles) or section.all()
 
         result_set = []
 
@@ -61,17 +53,9 @@ class PlexApiHandler(object):
         return result_set
 
     def process_movies(self, section: MovieSection, directory, movie_name):
-        library = section.searchMovies(title=movie_name)
-
-        # fall back to using the movie name without date
-        if not library:
-            movie_name_without_date = name_without_date(movie_name)
-            if movie_name_without_date:
-                library = section.searchMovies(title=movie_name_without_date)
-
-        # fall back to searching the entire library (slowest)
-        if not library:
-            library = section.all()
+        movie_name_without_date = name_without_date(movie_name)
+        movie_titles = "{},{}".format(movie_name, movie_name_without_date)
+        library = section.searchMovies(title=movie_titles) or section.all()
 
         result_set = []
 
