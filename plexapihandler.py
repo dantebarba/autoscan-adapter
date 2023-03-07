@@ -1,55 +1,76 @@
-import os
+import pathlib
 from plexapi.server import PlexServer
 from plexapi.library import ShowSection, MovieSection
-from plexapi.video import Movie, Episode
+
+
+def name_without_date(name):
+    parts = name.split(" ")
+    date_maybe = parts[-1]
+    if date_maybe.startswith("(") and date_maybe.endswith(")"):
+        return name.replace(date_maybe, "").rstrip()
 
 
 class PlexApiHandler(object):
-
     def __init__(self, baseurl, token):
         self.baseurl = baseurl
         self.plex = PlexServer(self.baseurl, token)
 
-    def find_metadata_from_dirs(self, directories):
-        """ finds all the metadata elements from directories """
+    def find_section_from_dirs(self, directory):
         sections = self.plex.library.sections()
-        result_set = []
+
         for section in sections:
+            for location in section.locations:
+                if directory.startswith(location):
+                    return section, location
+
+    def find_metadata_from_dirs(self, directory):
+        """finds all the metadata elements from directories"""
+
+        result = self.find_section_from_dirs(directory)
+        if result:
+            section, location = result
+            section_parts = len(pathlib.PurePath(location).parts)
+            media_name = pathlib.PurePath(directory).parts[section_parts]
+
             if isinstance(section, MovieSection):
-                result_set.extend(self.process_movies(section, directories))
-            if isinstance(section, ShowSection):
-                result_set.extend(self.process_shows(section, directories))
+                return self.process_movies(section, directory, media_name)
+            elif isinstance(section, ShowSection):
+                return self.process_shows(section, directory, media_name)
 
-        return result_set
+    def process_shows(self, section: ShowSection, directory, show_name):
+        show_name_without_date = name_without_date(show_name)
+        show_titles = "{},{}".format(show_name, show_name_without_date)
+        library = section.searchShows(title=show_titles) or section.all()
 
-    @staticmethod
-    def file_path(full_path):
-        head, tail = os.path.split(full_path)
-        return head
-
-    def process_shows(self, section: ShowSection, directories):
-        library = section.all()
         result_set = []
+
         for element in library:
             for episode in element.episodes():
                 for part in episode.iterParts():
-                    if part.file in directories:
+                    if part.file.startswith(directory):
                         result_set.append(episode)
 
         return result_set
 
-    def process_movies(self, section: MovieSection, directories):
-        library = section.all()
+    def process_movies(self, section: MovieSection, directory, movie_name):
+        movie_name_without_date = name_without_date(movie_name)
+        movie_titles = "{},{}".format(movie_name, movie_name_without_date)
+        library = section.searchMovies(title=movie_titles) or section.all()
+
         result_set = []
+
         for element in library:
             for part in element.iterParts():
-                if PlexApiHandler.file_path(part.file) in directories:
+                if part.file.startswith(directory):
                     result_set.append(element)
+
         return result_set
 
     def refresh_metadata(self, metadata_files):
         files_refreshed = []
+
         for element in metadata_files:
             element.refresh()
             files_refreshed.append(element.title)
+
         return files_refreshed
