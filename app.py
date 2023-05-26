@@ -5,7 +5,7 @@ from flask import Flask, jsonify, request, current_app
 from plexapihandler import PlexApiHandler
 
 app = Flask(__name__)
-sleep = int(os.getenv("SLEEP_INTERVAL", ""))
+sleep = int(os.getenv("SLEEP_INTERVAL", "0"))
 plex_api = PlexApiHandler(os.getenv("PLEX_URL"), os.getenv("PLEX_TOKEN"))
 
 
