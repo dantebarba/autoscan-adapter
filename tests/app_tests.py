@@ -1,9 +1,11 @@
 import unittest
 
+from flask import Flask
+
 
 class AppTest(unittest.TestCase):
     def setUp(self):
-        self.client = flaskapp.app.test_client()
+        self.client = Flask("test").app.test_client()
         self.base_url = "http://127.0.0.1"
 
     def test_process_triggers(self):

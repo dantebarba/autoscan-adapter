@@ -69,8 +69,9 @@ class PlexApiHandler(object):
     def refresh_metadata(self, metadata_files):
         files_refreshed = []
 
-        for element in metadata_files:
-            element.refresh()
-            files_refreshed.append(element.title)
+        if metadata_files:
+            for element in metadata_files:
+                element.refresh()
+                files_refreshed.append(element.title)
 
         return files_refreshed
