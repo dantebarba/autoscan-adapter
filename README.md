@@ -19,6 +19,9 @@ pip install -r requirements.txt
 ```bash
 PLEX_URL=http://plex.domain.tld:32400
 PLEX_TOKEN=YOUR-PLEX-TOKEN
+ANALYZE_MEDIA="" # perform analysis of the media files after refresh. Empty or unset to disable
+REFRESH_MEDIA="true" # perform metadata refresh of the media files. Active by default.
+SLEEP="0" # wait before starting the scanning process after each request. default is 0 (disabled)
 ```
 
 2. Run the python flask server
@@ -69,5 +72,9 @@ services:
       PUID: $PUID
       PLEX_URL: $PLEX_URL
       PLEX_TOKEN: $PLEX_TOKEN
+      # perform analysis of the media files after refresh. empty or unset to disable. default: empty
+      ANALYZE_MEDIA: $ANALYZE_MEDIA
+      SLEEP: $SLEEP
+      REFRESH_MEDIA: $REFRESH_MEDIA
 ```
 
