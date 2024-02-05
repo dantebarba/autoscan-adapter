@@ -22,6 +22,7 @@ PLEX_TOKEN=YOUR-PLEX-TOKEN
 ANALYZE_MEDIA="" # perform analysis of the media files after refresh. Empty or unset to disable
 REFRESH_MEDIA="true" # perform metadata refresh of the media files. Active by default.
 SLEEP="0" # wait before starting the scanning process after each request. default is 0 (disabled)
+LOG_LEVEL="INFO" # the logging level for the application. Available values are DEBUG, INFO, WARNING, ERROR. Default is INFO
 ```
 
 2. Run the python flask server
@@ -76,5 +77,6 @@ services:
       ANALYZE_MEDIA: $ANALYZE_MEDIA
       SLEEP: $SLEEP
       REFRESH_MEDIA: $REFRESH_MEDIA
+      LOG_LEVEL: $LOG_LEVEL
 ```
 

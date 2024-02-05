@@ -4,11 +4,15 @@ import time
 from flask import Flask, jsonify, request, current_app
 from plexapihandler import PlexApiHandler
 
-app = Flask(__name__)
-sleep = int(os.getenv("SLEEP_INTERVAL", "0"))
-plex_api = PlexApiHandler(os.getenv("PLEX_URL"), os.getenv("PLEX_TOKEN"))
 ENV_ANALYZE_MEDIA = os.getenv("ANALYZE_MEDIA", "")
 ENV_REFRESH_MEDIA = os.getenv("REFRESH_MEDIA", "true")
+ENV_LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+
+app = Flask(__name__)
+app.logger.setLevel(ENV_LOG_LEVEL)
+sleep = int(os.getenv("SLEEP_INTERVAL", "0"))
+plex_api = PlexApiHandler(os.getenv("PLEX_URL"), os.getenv("PLEX_TOKEN"))
+
 
 @app.route("/")
 def ping():
