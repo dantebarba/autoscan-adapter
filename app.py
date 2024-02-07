@@ -7,11 +7,12 @@ from plexapihandler import PlexApiHandler
 app = Flask(__name__)
 sleep = int(os.getenv("SLEEP_INTERVAL", "0"))
 plex_api = PlexApiHandler(os.getenv("PLEX_URL"), os.getenv("PLEX_TOKEN"))
-
+ENV_ANALYZE_MEDIA = os.getenv("ANALYZE_MEDIA", "")
+ENV_REFRESH_MEDIA = os.getenv("REFRESH_MEDIA", "true")
 
 @app.route("/")
 def ping():
-    return "Ping successfull"
+    return "Ping successful"
 
 @app.route("/triggers/manual", methods=["HEAD"])
 def ok():
@@ -28,6 +29,6 @@ def trigger():
 
     if directory:
         metadata_files = plex_api.find_metadata_from_dirs(directory=directory)
-        files_refreshed = plex_api.refresh_metadata(metadata_files)
+        files_refreshed = plex_api.refresh_metadata(metadata_files, ENV_ANALYZE_MEDIA, ENV_REFRESH_MEDIA)
         return jsonify(metadata_entries=files_refreshed)
     return jsonify(metadata_files=[])
