@@ -1,6 +1,8 @@
 import pathlib
 from plexapi.server import PlexServer
 from plexapi.library import ShowSection, MovieSection
+from flask import current_app
+
 
 def name_without_date(name):
     parts = name.split(" ")
@@ -71,8 +73,10 @@ class PlexApiHandler(object):
         if metadata_files:
             for element in metadata_files:
                 if also_refresh:
+                    current_app.logger.debug(f"Refreshing metadata of : {element.title}")
                     element.refresh()
                 if also_analyze:
+                    current_app.logger.debug(f"Analyzing element : {element.title}")
                     element.analyze()
                 files_refreshed.append(element.title)
 
