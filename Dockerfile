@@ -12,5 +12,6 @@ ENV PLEX_TOKEN ""
 ENV ANALYZE_MEDIA ""
 ENV REFRESH_MEDIA "true"
 ENV LOG_LEVEL "INFO"
+ENV SLEEP_INTERVAL "0"
 
 CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
