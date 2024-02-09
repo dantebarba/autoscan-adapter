@@ -13,15 +13,15 @@ sleep = int(os.getenv("SLEEP_INTERVAL", "0"))
 plex_api = PlexApiHandler(os.getenv("PLEX_URL"), os.getenv("PLEX_TOKEN"))
 
 
-@app.route("/")
+@main_bp.route("/")
 def ping():
     return "Ping successful"
 
-@app.route("/triggers/manual", methods=["HEAD"])
+@main_bp.route("/triggers/manual", methods=["HEAD"])
 def ok():
     return "Ok"
 
-@app.route("/triggers/manual", methods=["POST", "GET"])
+@main_bp.route("/triggers/manual", methods=["POST", "GET"])
 def trigger():
     directory = request.args.get("dir")
 
