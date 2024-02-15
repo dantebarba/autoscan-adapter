@@ -1,15 +1,9 @@
 import pathlib
+import time
+import nameprocessor
 from plexapi.server import PlexServer
 from plexapi.library import ShowSection, MovieSection
 from flask import current_app
-
-
-def name_without_date(name):
-    parts = name.split(" ")
-    date_maybe = parts[-1]
-    if date_maybe.startswith("(") and date_maybe.endswith(")"):
-        return name.replace(date_maybe, "").rstrip()
-
 
 class PlexApiHandler(object):
     def __init__(self, baseurl, token):
@@ -30,8 +24,9 @@ class PlexApiHandler(object):
         result = self.find_section_from_dirs(directory)
         if result:
             section, location = result
-            section_parts = len(pathlib.PurePath(location).parts)
-            media_name = pathlib.PurePath(directory).parts[section_parts]
+            section_parts_len = len(pathlib.PurePath(location).parts)
+            directory_parts = pathlib.PurePath(directory).parts
+            media_name = pathlib.PurePath(directory).parts[section_parts_len] if section_parts_len < len(directory_parts) else ""
 
             if isinstance(section, MovieSection):
                 return self.process_movies(section, directory, media_name)
@@ -39,8 +34,8 @@ class PlexApiHandler(object):
                 return self.process_shows(section, directory, media_name)
 
     def process_shows(self, section: ShowSection, directory, show_name):
-        show_name_without_date = name_without_date(show_name)
-        show_titles = "{},{}".format(show_name, show_name_without_date)
+        show_name_preprocessed = nameprocessor.preprocess_show_directory(show_name)
+        show_titles = "{},{}".format(show_name, show_name_preprocessed)
         library = section.searchShows(title=show_titles) or section.all()
 
         result_set = []
@@ -54,10 +49,17 @@ class PlexApiHandler(object):
         return result_set
 
     def process_movies(self, section: MovieSection, directory, movie_name):
-        movie_name_without_date = name_without_date(movie_name)
+        movie_name_without_date = nameprocessor.preprocess_movie_directory(movie_name)
         movie_titles = "{},{}".format(movie_name, movie_name_without_date)
+        # FIXME: REMOVE FROM HERE
+        t0 = time.perf_counter()
         library = section.searchMovies(title=movie_titles) or section.all()
-
+        t1 = time.perf_counter()
+        total_n = t1-t0
+        print(f"elapsed time: {total_n}")
+        # FIXME: REMOVE UNTIL HERE
+        # elapsed time: 0.22602438000001257 with searchMovie and 4000ish library
+        # elapsed time: 25.33106328800011 with section.all() and 4000ish library
         result_set = []
 
         for element in library:

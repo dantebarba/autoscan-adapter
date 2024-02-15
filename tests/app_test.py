@@ -44,3 +44,16 @@ class AppTest(unittest.TestCase):
         self.assertEquals(response.status_code, 200)
         
         print(json.loads(response.data))
+        
+    def test_process_triggers_with_subdirectory(self):
+        media_directory = os.getenv("TEST_DIRECTORY_SUBDIR", "/test/testdir")
+        response = self.client.post(
+            "/triggers/manual",
+            query_string={"dir": [media_directory]},
+            base_url=self.base_url,
+            content_type="application/json"
+        )
+
+        self.assertEquals(response.status_code, 200)
+        
+        print(json.loads(response.data))
