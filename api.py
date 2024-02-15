@@ -23,15 +23,19 @@ def ok():
 
 @main_bp.route("/triggers/manual", methods=["POST", "GET"])
 def trigger():
-    directory = request.args.get("dir")
+    directories = request.args.getlist("dir")
 
     if sleep:
         time.sleep(sleep)
     
-    current_app.logger.warning("Starting directory scan of: {}".format(directory))
+    current_app.logger.warning("Starting directory scan of: {}".format(directories))
 
-    if directory:
-        metadata_files = plex_api.find_metadata_from_dirs(directory=directory)
-        files_refreshed = plex_api.refresh_metadata(metadata_files, ENV_ANALYZE_MEDIA, ENV_REFRESH_MEDIA)
-        return jsonify(metadata_entries=files_refreshed)
-    return jsonify(metadata_files=[])
+    metadata_entries = []
+
+    if directories:
+        for directory in directories:
+            metadata_files = plex_api.find_metadata_from_dirs(directory=directory)
+            files_refreshed = plex_api.refresh_metadata(metadata_files, ENV_ANALYZE_MEDIA, ENV_REFRESH_MEDIA)
+            metadata_entries.extend(files_refreshed)
+    
+    return jsonify(metadata_entries=metadata_entries)
