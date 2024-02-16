@@ -23,6 +23,7 @@ ANALYZE_MEDIA="" # perform analysis of the media files after refresh. Empty or u
 REFRESH_MEDIA="true" # perform metadata refresh of the media files. Active by default.
 SLEEP_INTERVAL="0" # wait before starting the scanning process after each request. default is 0 (disabled)
 LOG_LEVEL="INFO" # the logging level for the application. Available values are DEBUG, INFO, WARNING, ERROR. Default is INFO
+DIRECTORY_PROC_MODULE="nameprocessor" # directory name processor. Explained in more detail below
 ```
 
 2. Run the python flask server
@@ -78,5 +79,33 @@ services:
       SLEEP_INTERVAL: $SLEEP
       REFRESH_MEDIA: $REFRESH_MEDIA
       LOG_LEVEL: $LOG_LEVEL
+      DIRECTORY_PROC_MODULE: $DIRECTORY_PROC_MODULE
+    volumes:
+      - ./customprocessor.py:/app/customprocessor.py # custom processing function
 ```
 
+## Custom directory name processors
+
+Custom name processors are functions that allow you to transform the show/movie directory into something searchable in Plex. By default there is already a processor installed that covers the basic radarr and sonarr naming convention for directories like: _Movie Name (year)_. If you have this configuration **you don't need to implement your own processor**
+
+If you have your own naming convention for radarr/sonarr directories you **might** want to implement your own processor. For this you'll need to set the environment variable **DIRECTORY_PROC_MODULE** with your custom processor module name like **"customprocessor"**. 
+
+The processor must implement two functions as follows:
+
+```python
+def preprocess_movie_directory(name: str):
+  """ implement this function returning the processed directory name """
+  return name
+```
+
+```python
+def preprocess_show_directory(name:str):
+  """ implement this function returning the processed directory name """
+  return name
+```
+
+#### Why should I implement a processor
+
+You are not obligated to implement your processor **even if you have a non-standard naming convention in radarr/sonarr**. Implementing a processor is an advanced feature to improve performance, since for **very big libraries (1000ish elements or more)** gathering all the library elements could take **as long as 30 seconds**. In comparison, using library search will take you less than **1 second**
+
+The processor is meant to convert a non-standard movie name to a searchable movie name e.g. `Blue.Beetle_(2018)` into `Blue Beetle`. 
